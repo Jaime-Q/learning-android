@@ -18,18 +18,28 @@ import {
   KeyboardAvoidingView,
   Platform,
   ScrollView,
+  Image,
 } from 'react-native';
 import { supabase } from '../../lib/supabase';
 import bcrypt from 'bcryptjs';
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
+interface User {
+  id: number;
+  firstname: string;
+  lastname: string;
+  email: string;
+  mobile_number: string;
+  avatar_url: string;
+}
+
 interface LoginProps {
-  onLoginSuccess: () => void;
+  onLoginSuccess: (user: User) => void;
   onRegisterPress: () => void;
 }
 
-const Login: React.FC<LoginProps> = ({ onLoginSuccess, onRegisterPress }) => {
+const Login: React.FC<LoginProps> = ({ onLoginSuccess, onRegisterPress}) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [focused, setFocused] = useState<string>('');
@@ -75,7 +85,7 @@ const Login: React.FC<LoginProps> = ({ onLoginSuccess, onRegisterPress }) => {
       // 1. Buscar al usuario por email en tu tabla 'users'
       const { data: users, error: fetchError } = await supabase
         .from('users')
-        .select('password') // Solo necesitamos la contraseña hasheada
+        .select('*') // Traemos todos los datos del usuario
         .eq('email', userEmail)
         .single(); // .single() devuelve un error si no se encuentra exactamente un usuario
 
@@ -92,10 +102,10 @@ const Login: React.FC<LoginProps> = ({ onLoginSuccess, onRegisterPress }) => {
       }
 
       // 3. Login exitoso
-      // Aquí es donde la autenticación manual se complica. No tienes una sesión de Supabase.
-      // Por ahora, solo mostraremos una alerta y llamaremos a onLoginSuccess.
+      // Llamamos a onLoginSuccess con los datos del usuario (excluyendo la contraseña)
+      const { password: _, ...userProfile } = users;
       Alert.alert('Éxito', 'Has iniciado sesión correctamente.');
-      onLoginSuccess();
+      onLoginSuccess(userProfile);
 
     } catch (e: any) {
       const message = e.message || 'Ocurrió un error desconocido.';
@@ -119,8 +129,12 @@ const Login: React.FC<LoginProps> = ({ onLoginSuccess, onRegisterPress }) => {
     >
       <ScrollView contentContainerStyle={styles.container} keyboardShouldPersistTaps="handled">
         <View style={styles.card}>
+          <Image
+            source={require('../assets/images/proteccion.png')}
+            style={styles.logo}
+          />
           <Text style={styles.title}>Sign in</Text>
-
+ 
           <View style={styles.inputWrap}>
             <Text style={styles.label}>Email</Text>
             <TextInput
@@ -198,11 +212,19 @@ const styles = StyleSheet.create({
     backgroundColor: '#111827',
     borderRadius: 16,
     padding: 20,
+    alignItems: 'center',
     shadowColor: '#000',
     shadowOpacity: 0.2,
     shadowRadius: 12,
     shadowOffset: { width: 0, height: 6 },
     elevation: 6,
+  },
+  logo: {
+    width: 100,
+    height: 100,
+    marginBottom: 16,
+    borderRadius: 20, // Bordes redondeados para el logo
+    backgroundColor: '#334155',
   },
   title: {
     fontSize: 28,
@@ -212,6 +234,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   inputWrap: {
+    width: '100%',
     marginVertical: 6,
   },
   label: {
