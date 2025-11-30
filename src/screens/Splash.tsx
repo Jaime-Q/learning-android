@@ -13,7 +13,7 @@ const Splash = ({ onFinish }: { onFinish: () => void }) => {
     return (
         <View style={styles.container}> 
             <Image
-                source={require('../assets/images/proteccion.png')}
+                source={require('../assets/images/main_logo.png')}
                 style={styles.logo}
                 resizeMode='contain'
             />

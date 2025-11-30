@@ -129,10 +129,6 @@ const Login: React.FC<LoginProps> = ({ onLoginSuccess, onRegisterPress}) => {
     >
       <ScrollView contentContainerStyle={styles.container} keyboardShouldPersistTaps="handled">
         <View style={styles.card}>
-          <Image
-            source={require('../assets/images/proteccion.png')}
-            style={styles.logo}
-          />
           <Text style={styles.title}>Sign in</Text>
  
           <View style={styles.inputWrap}>
@@ -218,13 +214,6 @@ const styles = StyleSheet.create({
     shadowRadius: 12,
     shadowOffset: { width: 0, height: 6 },
     elevation: 6,
-  },
-  logo: {
-    width: 100,
-    height: 100,
-    marginBottom: 16,
-    borderRadius: 20, // Bordes redondeados para el logo
-    backgroundColor: '#334155',
   },
   title: {
     fontSize: 28,

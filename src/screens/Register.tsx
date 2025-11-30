@@ -37,16 +37,6 @@ if (!global.crypto || !global.crypto.getRandomValues) {
   });
 }
 
-// --- AVATARES PARA SELECCIONAR ---
-const AVATARS = [
-  'https://api.dicebear.com/8.x/pixel-art/png?seed=avatar1&background=%23a9a9a9',
-  'https://api.dicebear.com/8.x/pixel-art/png?seed=avatar2&background=%23a9a9a9',
-  'https://api.dicebear.com/8.x/pixel-art/png?seed=avatar3&background=%23a9a9a9',
-  'https://api.dicebear.com/8.x/pixel-art/png?seed=avatar4&background=%23a9a9a9',
-  'https://api.dicebear.com/8.x/pixel-art/png?seed=avatar5&background=%23a9a9a9',
-];
-// ---------------------------------
-
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 interface RegisterProps {
@@ -60,7 +50,6 @@ const Register: React.FC<RegisterProps> = ({ onLoginPress }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirm, setConfirm] = useState('');
-  const [selectedAvatar, setSelectedAvatar] = useState<string | null>(AVATARS[0]); // Avatar por defecto
   const [loading, setLoading] = useState(false);
 
   // Estado para saber qué input está en foco ('' | 'firstname' | 'lastname' | ...)
@@ -83,7 +72,6 @@ const Register: React.FC<RegisterProps> = ({ onLoginPress }) => {
     setEmail('');
     setPassword('');
     setConfirm('');
-    setSelectedAvatar(AVATARS[0]);
     setTouched({
       firstname: false,
       lastname: false,
@@ -131,18 +119,12 @@ const Register: React.FC<RegisterProps> = ({ onLoginPress }) => {
     return null;
   };
 
-  const avatarError = (): string | null => {
-    if (!selectedAvatar) return 'Debes seleccionar un avatar';
-    return null;
-  };
-
   // Validación global antes de enviar
   const validateAll = (): string | null => {
     const errs = [
       firstnameError(),
       lastnameError(),
       mobileError(),
-      avatarError(),
       emailError(),
       passwordError(),
       confirmError(),
@@ -179,12 +161,15 @@ const Register: React.FC<RegisterProps> = ({ onLoginPress }) => {
       }
 
       const nowIso = new Date().toISOString();
+      const userEmail = email.trim().toLowerCase();
+      const avatarUrl = `https://api.dicebear.com/8.x/pixel-art/png?seed=${encodeURIComponent(userEmail)}&background=%23a9a9a9`;
+
       const payload = {
         firstname: firstname.trim(),
         lastname: lastname.trim(),
         mobile_number: mobile.trim(),
-        email: email.trim().toLowerCase(),
-        avatar_url: selectedAvatar,
+        email: userEmail,
+        avatar_url: avatarUrl,
         password: hashed,
         status: true,
         created_at: nowIso,
@@ -219,7 +204,6 @@ const Register: React.FC<RegisterProps> = ({ onLoginPress }) => {
     email: touched.email ? emailError() : null,
     password: touched.password ? passwordError() : null,
     confirm: touched.confirm ? confirmError() : null,
-    avatar: touched.firstname ? avatarError() : null, // Re-validar con cualquier toque
   };
 
   return (
@@ -229,29 +213,7 @@ const Register: React.FC<RegisterProps> = ({ onLoginPress }) => {
     >
       <ScrollView contentContainerStyle={styles.container} keyboardShouldPersistTaps="handled">
         <View style={styles.card}>
-          <Image
-            source={require('../assets/images/reg.png')}
-            style={styles.logo}
-          />
           <Text style={styles.title}>Create account</Text>
-
-          <View style={styles.inputWrap}>
-            <Text style={styles.label}>Choose your avatar</Text>
-            <View style={styles.avatarContainer}>
-              {AVATARS.map((url) => (
-                <TouchableOpacity key={url} onPress={() => setSelectedAvatar(url)}>
-                  <Image
-                    source={{ uri: url }}
-                    style={[
-                      styles.avatar,
-                      selectedAvatar === url && styles.avatarSelected,
-                    ]}
-                  />
-                </TouchableOpacity>
-              ))}
-            </View>
-            {errors.avatar && <Text style={styles.errorText}>{errors.avatar}</Text>}
-          </View>
 
           <View style={styles.row}>
             <View style={[styles.inputWrap, { marginRight: 6 }]}>
@@ -408,29 +370,6 @@ const styles = StyleSheet.create({
     shadowRadius: 12,
     shadowOffset: { width: 0, height: 6 },
     elevation: 6,
-  },
-  logo: {
-    width: 100,
-    height: 100,
-    marginBottom: 16,
-    borderRadius: 20,
-    backgroundColor: '#334155',
-  },
-  avatarContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    marginBottom: 10,
-  },
-  avatar: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
-    backgroundColor: '#334155',
-  },
-  avatarSelected: {
-    borderWidth: 3,
-    borderColor: '#22c55e', // Verde para indicar selección
-    transform: [{ scale: 1.1 }],
   },
   title: {
     fontSize: 28,

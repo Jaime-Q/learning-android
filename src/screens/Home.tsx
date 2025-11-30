@@ -89,7 +89,7 @@ export default function Main({ onLogout, user }: MainProps) {
         <View style={styles.profileContainer}>
           <Image
             source={
-              user.avatar_url ? { uri: user.avatar_url } : require("../assets/images/proteccion.png")
+              user.avatar_url ? { uri: user.avatar_url } : require("../assets/images/perfil.png")
             }
             style={styles.profileImage}
           />
