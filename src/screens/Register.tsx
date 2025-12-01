@@ -37,6 +37,15 @@ if (!global.crypto || !global.crypto.getRandomValues) {
   });
 }
 
+const AVATAR_STYLES = [
+  'pixel-art',
+  'adventurer',
+  'bottts',
+  'avataaars',
+  'lorelei',
+  'miniavs',
+];
+
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 interface RegisterProps {
@@ -51,6 +60,7 @@ const Register: React.FC<RegisterProps> = ({ onLoginPress }) => {
   const [password, setPassword] = useState('');
   const [confirm, setConfirm] = useState('');
   const [loading, setLoading] = useState(false);
+  const [avatarStyle, setAvatarStyle] = useState(AVATAR_STYLES[0]);
 
   // Estado para saber qué input está en foco ('' | 'firstname' | 'lastname' | ...)
   const [focused, setFocused] = useState<string>('');
@@ -71,6 +81,7 @@ const Register: React.FC<RegisterProps> = ({ onLoginPress }) => {
     setMobile('');
     setEmail('');
     setPassword('');
+    setAvatarStyle(AVATAR_STYLES[0]);
     setConfirm('');
     setTouched({
       firstname: false,
@@ -162,7 +173,7 @@ const Register: React.FC<RegisterProps> = ({ onLoginPress }) => {
 
       const nowIso = new Date().toISOString();
       const userEmail = email.trim().toLowerCase();
-      const avatarUrl = `https://api.dicebear.com/8.x/pixel-art/png?seed=${encodeURIComponent(userEmail)}&background=%23a9a9a9`;
+      const avatarUrl = `https://api.dicebear.com/8.x/${avatarStyle}/png?seed=${encodeURIComponent(userEmail)}&background=%23a9a9a9`;
 
       const payload = {
         firstname: firstname.trim(),
@@ -214,6 +225,24 @@ const Register: React.FC<RegisterProps> = ({ onLoginPress }) => {
       <ScrollView contentContainerStyle={styles.container} keyboardShouldPersistTaps="handled">
         <View style={styles.card}>
           <Text style={styles.title}>Create account</Text>
+
+          <View style={styles.avatarContainer}>
+            <Image
+              source={{
+                uri: `https://api.dicebear.com/8.x/${avatarStyle}/png?seed=${encodeURIComponent(email.trim().toLowerCase() || 'placeholder')}&background=%23a9a9a9`,
+              }}
+              style={styles.avatarPreview}
+            />
+            <View style={styles.avatarSelector}>
+              {AVATAR_STYLES.map((style) => (
+                <TouchableOpacity
+                  key={style}
+                  style={[styles.avatarOption, avatarStyle === style && styles.avatarOptionSelected]}
+                  onPress={() => setAvatarStyle(style)}
+                />
+              ))}
+            </View>
+          </View>
 
           <View style={styles.row}>
             <View style={[styles.inputWrap, { marginRight: 6 }]}>
@@ -370,6 +399,33 @@ const styles = StyleSheet.create({
     shadowRadius: 12,
     shadowOffset: { width: 0, height: 6 },
     elevation: 6,
+  },
+  avatarContainer: {
+    alignItems: 'center',
+    marginBottom: 16,
+  },
+  avatarPreview: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    backgroundColor: '#334155',
+    marginBottom: 12,
+  },
+  avatarSelector: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+  },
+  avatarOption: {
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    backgroundColor: '#334155',
+    marginHorizontal: 8,
+    borderWidth: 2,
+    borderColor: 'transparent',
+  },
+  avatarOptionSelected: {
+    borderColor: '#22c55e', // verde
   },
   title: {
     fontSize: 28,

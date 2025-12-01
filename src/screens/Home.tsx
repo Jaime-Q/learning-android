@@ -13,6 +13,7 @@ import MainMenu from "./MainMenu";
 
 interface Product {
   id: number;
+  title: string;
   price: number;
   description: string;
   image: string;
@@ -88,7 +89,7 @@ export default function Main({ onLogout, user }: MainProps) {
         <View style={styles.profileContainer}>
           <Image
             source={
-              user.avatar_url ? { uri: user.avatar_url } : require("../assets/images/perfil.png")
+              user.avatar_url ? { uri: user.avatar_url } : require("../assets/images/main_logo.png")
             }
             style={styles.profileImage}
           />
@@ -125,7 +126,7 @@ export default function Main({ onLogout, user }: MainProps) {
         // Vista de Home (por defecto)
         <View style={styles.home}>
           <Text style={styles.homeText}>
-            ¡Welcome, {user.firstname}!
+            Welcome, {user.firstname}!
           </Text>
         </View>
       )}
